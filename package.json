@@ -1,0 +1,72 @@
+{
+  "name": "new-project",
+  "displayName": "hello-world-react-vite",
+  "description": "A hello world sample extension to demonstrate using React + Vite with the Webview UI Toolkit for VS Code.",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.46.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:new-project.newProject"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "new-project.newProject",
+        "title": "New Project"
+      }
+    ]
+  },
+  "scripts": {
+    "start:webview": "npm --prefix ./webview-ui run start",
+    "build:webview": "npm --prefix ./webview-ui run build",
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "postinstall": "pnpx simple-git-hooks"
+  },
+  "devDependencies": {
+    "@types/glob": "^7.1.3",
+    "@types/node": "^12.11.7",
+    "@types/vscode": "^1.46.0",
+    "@typescript-eslint/eslint-plugin": "^4.14.1",
+    "@typescript-eslint/parser": "^4.14.1",
+    "eslint": "^7.19.0",
+    "glob": "^7.1.6",
+    "prettier": "^2.3.2",
+    "typescript": "^4.1.3",
+    "vscode-test": "^1.5.0",
+    "@liuli-util/prettier-standard-config": "^0.2.0",
+    "@commitlint/cli": "^12.1.4",
+    "@liuli-util/commitlint-standard-config": "^0.1.6",
+    "simple-git-hooks": "^2.5.1",
+    "lint-staged": "^11.1.1"
+  },
+  "sync": [
+    "prettier",
+    "commitlint",
+    "simplehooks"
+  ],
+  "prettier": "@liuli-util/prettier-standard-config",
+  "simple-git-hooks": {
+    "commit-msg": "pnpx commitlint --edit $1",
+    "pre-commit": "pnpx lint-staged"
+  },
+  "commitlint": {
+    "extends": [
+      "@liuli-util/commitlint-standard-config"
+    ]
+  },
+  "lint-staged": {
+    "src/**/*.{ts,tsx,js,jsx,css,vue}": [
+      "prettier --write",
+      "git add"
+    ]
+  }
+}
