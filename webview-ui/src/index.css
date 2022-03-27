@@ -1,8 +1,7 @@
 html,
 body {
   margin: 0;
-  padding: 0;
-  background-color: #0a192f;
+  /* background-color: #0a192f; */
   height: 100%;
 }
 
@@ -10,6 +9,7 @@ body {
   min-height: 100%;
   display: grid;
   grid-template-rows: 1fr;
+  padding: 40px;
 }
 
 * {

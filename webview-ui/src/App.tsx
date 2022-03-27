@@ -1,20 +1,12 @@
 import { VSCodePanels, VSCodePanelTab, VSCodePanelView } from '@vscode/webview-ui-toolkit/react'
-import { BootstrapForm, Conifg } from './components/BootstrapForm'
-
-interface BootstrapConfig {
-  id: string
-  title: string
-  package: string
-  command: string
-  configs: Conifg[]
-}
+import { useState } from 'react'
+import { BootstrapConfig, BootstrapForm } from './components/BootstrapForm'
 
 const list: BootstrapConfig[] = [
   {
     id: 'vite',
     title: 'Vite',
-    package: 'create-vite',
-    command: 'create-vite',
+    command: 'vite',
     configs: [
       {
         type: 'select',
@@ -40,13 +32,16 @@ const list: BootstrapConfig[] = [
   {
     id: 'create-react-app',
     title: 'React',
-    package: 'create-react-app',
-    command: 'create-react-app',
+    command: 'react-app',
     configs: [
       {
-        type: 'checkbox',
+        type: 'select',
         name: 'template',
-        label: 'TypeScript',
+        label: '模板',
+        options: [
+          { label: 'javascript', value: '' },
+          { label: 'typescript', value: 'typescript' },
+        ],
       },
     ],
   },
@@ -63,7 +58,7 @@ function App() {
         ))}
         {list.map((item) => (
           <VSCodePanelView key={item.id} title={item.title}>
-            <BootstrapForm configs={item.configs} />
+            <BootstrapForm {...item} />
           </VSCodePanelView>
         ))}
       </VSCodePanels>
