@@ -4,5 +4,5 @@ This is a vscode visual project creation plugin that attempts to provide a proje
 
 Here is a comparison of webstorm and vscode plugins
 
-! [webstorm](. /docs/webstorm-cover.png)
-! [vscode](. /docs/vscode-cover.png)
+![webstorm](./docs/webstorm-cover.png)
+![vscode](./docs/vscode-cover.png)
