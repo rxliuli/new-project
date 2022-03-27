@@ -3,6 +3,18 @@
   "displayName": "hello-world-react-vite",
   "description": "A hello world sample extension to demonstrate using React + Vite with the Webview UI Toolkit for VS Code.",
   "version": "0.0.1",
+  "scripts": {
+    "start:webview": "npm --prefix ./webview-ui run start",
+    "build:webview": "npm --prefix ./webview-ui run build",
+    "vscode:prepublish": "pnpm build",
+    "build": "esno build.js",
+    "dev": "esno build.js -w",
+    "release": "pnpm build && vsce package --yarn",
+    "pretest": "pnpm build && pnpm lint",
+    "lint": "eslint src --ext ts",
+    "postinstall": "pnpx simple-git-hooks"
+  },
+  "main": "./dist/extension.js",
   "engines": {
     "vscode": "^1.46.0"
   },
@@ -12,7 +24,6 @@
   "activationEvents": [
     "onCommand:new-project.newProject"
   ],
-  "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
@@ -21,15 +32,9 @@
       }
     ]
   },
-  "scripts": {
-    "start:webview": "npm --prefix ./webview-ui run start",
-    "build:webview": "npm --prefix ./webview-ui run build",
-    "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile && npm run lint",
-    "lint": "eslint src --ext ts",
-    "postinstall": "pnpx simple-git-hooks"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rxliuli/vscode-plugin-create-project"
   },
   "devDependencies": {
     "@commitlint/cli": "^12.1.4",
@@ -41,7 +46,9 @@
     "@types/vscode": "^1.46.0",
     "@typescript-eslint/eslint-plugin": "^4.14.1",
     "@typescript-eslint/parser": "^4.14.1",
+    "esbuild": "^0.14.28",
     "eslint": "^7.19.0",
+    "esno": "^0.14.1",
     "glob": "^7.1.6",
     "lint-staged": "^11.1.1",
     "prettier": "^2.3.2",
