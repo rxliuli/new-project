@@ -1,8 +1,9 @@
-import { Disposable, Webview, WebviewPanel, window, Uri, ViewColumn, commands } from 'vscode'
+import * as vscode from 'vscode'
 import { getUri } from '../utilities/getUri'
 import * as path from 'path'
 import { shellArgs } from '../utilities/shellArgs'
 import { pathExists, readdir, remove } from 'fs-extra'
+import which = require('which')
 
 /**
  * This class manages the state and behavior of HelloWorld webview panels.
@@ -16,8 +17,8 @@ import { pathExists, readdir, remove } from 'fs-extra'
  */
 export class CreateProjectPanel {
   public static currentPanel: CreateProjectPanel | undefined
-  private readonly _panel: WebviewPanel
-  private _disposables: Disposable[] = []
+  private readonly _panel: vscode.WebviewPanel
+  private _disposables: vscode.Disposable[] = []
 
   /**
    * The HelloWorldPanel class private constructor (called only from the render method).
@@ -25,7 +26,7 @@ export class CreateProjectPanel {
    * @param panel A reference to the webview panel
    * @param extensionUri The URI of the directory containing the extension
    */
-  private constructor(panel: WebviewPanel, extensionUri: Uri) {
+  private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
     this._panel = panel
 
     // Set an event listener to listen for when the panel is disposed (i.e. when the user closes
@@ -45,19 +46,19 @@ export class CreateProjectPanel {
    *
    * @param extensionUri The URI of the directory containing the extension.
    */
-  public static render(extensionUri: Uri) {
+  public static render(extensionUri: vscode.Uri) {
     if (CreateProjectPanel.currentPanel) {
       // If the webview panel already exists reveal it
-      CreateProjectPanel.currentPanel._panel.reveal(ViewColumn.One)
+      CreateProjectPanel.currentPanel._panel.reveal(vscode.ViewColumn.One)
     } else {
       // If a webview panel does not already exist create and show a new one
-      const panel = window.createWebviewPanel(
+      const panel = vscode.window.createWebviewPanel(
         // Panel view type
         'newProject',
         // Panel title
         'New Project',
         // The editor column the panel should be displayed in
-        ViewColumn.One,
+        vscode.ViewColumn.One,
         // Extra panel configurations
         {
           // Enable JavaScript in the webview
@@ -102,7 +103,7 @@ export class CreateProjectPanel {
    * @returns A template string literal containing the HTML that should be
    * rendered within the webview panel
    */
-  private _getWebviewContent(webview: Webview, extensionUri: Uri) {
+  private _getWebviewContent(webview: vscode.Webview, extensionUri: vscode.Uri) {
     // The CSS file from the React build output
     const stylesUri = getUri(webview, extensionUri, ['webview-ui', 'build', 'assets', 'index.css'])
     // The JS file from the React build output
@@ -133,14 +134,14 @@ export class CreateProjectPanel {
    * @param webview A reference to the extension webview
    * @param context A reference to the extension context
    */
-  private _setWebviewMessageListener(webview: Webview) {
+  private _setWebviewMessageListener(webview: vscode.Webview) {
     const map = new Map<string, (...args: any[]) => any>()
     map.set('hello', (text: string) => {
-      window.showInformationMessage(text)
+      vscode.window.showInformationMessage(text)
     })
     map.set('selectPath', async (text: string) => {
-      window.showInformationMessage(text)
-      const res = await window.showOpenDialog({
+      vscode.window.showInformationMessage(text)
+      const res = await vscode.window.showOpenDialog({
         canSelectFiles: false,
         canSelectFolders: true,
         canSelectMany: false,
@@ -149,7 +150,7 @@ export class CreateProjectPanel {
       if (!res) {
         return null
       }
-      return Uri.parse(res[0].path).fsPath
+      return vscode.Uri.parse(res[0].path).fsPath
     })
     interface CreateProjectData {
       packageManager: string
@@ -160,16 +161,17 @@ export class CreateProjectPanel {
     map.set('createProject', async (data: CreateProjectData) => {
       const location = path.resolve(data.location)
       if ((await pathExists(location)) && (await readdir(location)).length > 0) {
-        const answer = await window.showInformationMessage('Project already exists', 'Yes', 'No')
+        const answer = await vscode.window.showInformationMessage('Project already exists', 'Yes', 'No')
         if (!answer) {
           return
         }
         await remove(location)
       }
-      const terminal = window.createTerminal({
+      const shellPath = await which(data.packageManager)
+      const terminal = vscode.window.createTerminal({
         name: 'Create Project',
         cwd: path.dirname(location),
-        shellPath: 'C:/Users/rxliuli/AppData/Local/pnpm/pnpm.CMD',
+        shellPath,
         shellArgs: shellArgs([
           'create',
           data.command,
@@ -180,15 +182,19 @@ export class CreateProjectPanel {
       })
       terminal.show()
       await new Promise<void>((resolve) => {
-        window.onDidCloseTerminal((e) => {
+        vscode.window.onDidCloseTerminal((e) => {
           if (e.name === 'Create Project') {
             resolve()
           }
         })
       })
       console.log('执行完了')
-      await commands.executeCommand('vscode.openFolder', Uri.file(location), true)
+      await vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(location), true)
       this._panel.dispose()
+    })
+    map.set('getCurrentPath', async () => {
+      await new Promise((resolve) => setTimeout(resolve, 100))
+      return vscode.workspace.workspaceFolders?.[0].uri.fsPath
     })
 
     webview.onDidReceiveMessage(
@@ -199,6 +205,7 @@ export class CreateProjectPanel {
         }
         const res = await map.get(command)!(...data)
         if (callback) {
+          console.log('callback: ', callback)
           this._panel.webview.postMessage({
             command: callback,
             data: [res],

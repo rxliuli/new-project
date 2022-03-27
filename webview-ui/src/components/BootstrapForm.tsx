@@ -1,6 +1,6 @@
 import { VSCodeButton, VSCodeCheckbox, VSCodeDropdown, VSCodeOption } from '@vscode/webview-ui-toolkit/react'
 import React, { useState } from 'react'
-import { useMount } from 'react-use'
+import { useEffectOnce, useMount } from 'react-use'
 import { vscode } from '../utilities/vscode'
 import css from './BootstrapForm.module.css'
 
@@ -41,26 +41,28 @@ function TextField(props: { label: string; name: string; children: React.ReactNo
 async function invoke(command: string, ...args: any[]): Promise<any> {
   return await new Promise<string>((resolve) => {
     const id = Date.now() + '_' + Math.random()
+    const listener = (message: MessageEvent) => {
+      const data = message.data
+      if (data.command === id) {
+        resolve(data.data[0])
+        window.removeEventListener('message', listener)
+      }
+    }
+    window.addEventListener('message', listener)
     vscode.postMessage({
       command: command,
       data: args,
       callback: id,
     })
-    const listener = (message: MessageEvent) => {
-      const data = message.data
-      if (data.command === id) {
-        resolve(data.data[0])
-      }
-      window.removeEventListener('message', listener)
-    }
-    window.addEventListener('message', listener)
   })
 }
 
 function FilePathSelect(props: { value: string; onChange(value: string): void }) {
   async function onSelectPath() {
     const res = await invoke('selectPath')
-    props.onChange(res)
+    if (res) {
+      props.onChange(res)
+    }
   }
   return (
     <div className={css.FilePathSelect}>
@@ -72,13 +74,15 @@ function FilePathSelect(props: { value: string; onChange(value: string): void })
 
 export function BootstrapForm(props: BootstrapConfig) {
   const [form, setForm] = useState<{ location: string; packageManager: string } & Record<string, any>>({} as any)
-  useMount(() => {
+  useMount(async () => {
     const store = vscode.getState() as Record<string, any>
+    const currentPath = await invoke('getCurrentPath')
+    const init = { location: currentPath } as any
     if (store && store[props.id]) {
-      const init = store[props.id]
+      Object.assign(init, store[props.id])
       console.log('init: ', init)
-      setForm(init)
     }
+    setForm(init)
   })
   function onChange(name: string, value: any) {
     const val = { ...form, [name]: value }

@@ -1,9 +1,9 @@
-import { commands, ExtensionContext } from 'vscode'
+import * as vscode from 'vscode'
 import { CreateProjectPanel } from './panels/CreateProjectPanel'
 
-export function activate(context: ExtensionContext) {
+export function activate(context: vscode.ExtensionContext) {
   // Create the show hello world command
-  const showHelloWorldCommand = commands.registerCommand('new-project.newProject', () => {
+  const showHelloWorldCommand = vscode.commands.registerCommand('new-project.newProject', () => {
     CreateProjectPanel.render(context.extensionUri)
   })
 
