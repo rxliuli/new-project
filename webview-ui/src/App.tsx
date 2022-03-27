@@ -11,7 +11,7 @@ const list: BootstrapConfig[] = [
       {
         type: 'select',
         name: 'template',
-        label: '模板',
+        label: 'Template',
         options: [
           { label: 'vanilla', value: 'vanilla' },
           { label: 'vanilla-ts', value: 'vanilla-ts' },
@@ -37,7 +37,7 @@ const list: BootstrapConfig[] = [
       {
         type: 'select',
         name: 'template',
-        label: '模板',
+        label: 'Template',
         options: [
           { label: 'javascript', value: '' },
           { label: 'typescript', value: 'typescript' },

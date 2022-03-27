@@ -1,5 +1,6 @@
 import { VSCodeButton, VSCodeCheckbox, VSCodeDropdown, VSCodeOption } from '@vscode/webview-ui-toolkit/react'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
+import { useMount } from 'react-use'
 import { vscode } from '../utilities/vscode'
 import css from './BootstrapForm.module.css'
 
@@ -63,7 +64,7 @@ function FilePathSelect(props: { value: string; onChange(value: string): void })
   }
   return (
     <div className={css.FilePathSelect}>
-      <VSCodeButton onClick={onSelectPath}>选择路径</VSCodeButton>
+      <VSCodeButton onClick={onSelectPath}>Select Path</VSCodeButton>
       <span title={props.value}>{props.value}</span>
     </div>
   )
@@ -71,14 +72,14 @@ function FilePathSelect(props: { value: string; onChange(value: string): void })
 
 export function BootstrapForm(props: BootstrapConfig) {
   const [form, setForm] = useState<{ location: string; packageManager: string } & Record<string, any>>({} as any)
-  useEffect(() => {
+  useMount(() => {
     const store = vscode.getState() as Record<string, any>
     if (store && store[props.id]) {
       const init = store[props.id]
       console.log('init: ', init)
       setForm(init)
     }
-  }, [])
+  })
   function onChange(name: string, value: any) {
     const val = { ...form, [name]: value }
     setForm(val)
@@ -112,10 +113,10 @@ export function BootstrapForm(props: BootstrapConfig) {
   }
   return (
     <form className={css.BootstrapForm} onSubmit={onCreate}>
-      <TextField label={'选择目录'} name={'location'}>
+      <TextField label={'Location'} name={'location'}>
         <FilePathSelect value={form.location} onChange={(value) => onChange('location', value)} />
       </TextField>
-      <TextField label={'选择包管理器'} name={'packageManager'}>
+      <TextField label={'Package manager'} name={'packageManager'}>
         <VSCodeDropdown
           value={form.packageManager}
           onChange={(e) => onChange('packageManager', (e as React.ChangeEvent<HTMLSelectElement>).target.value)}
@@ -149,7 +150,7 @@ export function BootstrapForm(props: BootstrapConfig) {
         </TextField>
       ))}
       <div>
-        <VSCodeButton type={'submit'}>创建</VSCodeButton>
+        <VSCodeButton type={'submit'}>Create</VSCodeButton>
       </div>
     </form>
   )

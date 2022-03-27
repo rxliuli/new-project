@@ -45,12 +45,14 @@ class VSCodeAPIWrapper {
    * @return The current state or `undefined` if no state has been set.
    */
   public getState(): unknown | undefined {
-    if (this.vsCodeApi) {
-      return this.vsCodeApi.getState()
-    } else {
-      const state = localStorage.getItem('vscodeState')
-      return state ? JSON.parse(state) : undefined
-    }
+    // if (this.vsCodeApi) {
+    //   return this.vsCodeApi.getState()
+    // } else {
+    //   const state = localStorage.getItem('vscodeState')
+    //   return state ? JSON.parse(state) : undefined
+    // }
+    const state = localStorage.getItem('vscodeState')
+    return state ? JSON.parse(state) : undefined
   }
 
   /**
@@ -65,12 +67,14 @@ class VSCodeAPIWrapper {
    * @return The new state.
    */
   public setState<T extends unknown | undefined>(newState: T): T {
-    if (this.vsCodeApi) {
-      return this.vsCodeApi.setState(newState)
-    } else {
-      localStorage.setItem('vscodeState', JSON.stringify(newState))
-      return newState
-    }
+    // if (this.vsCodeApi) {
+    //   return this.vsCodeApi.setState(newState)
+    // } else {
+    //   localStorage.setItem('vscodeState', JSON.stringify(newState))
+    //   return newState
+    // }
+    localStorage.setItem('vscodeState', JSON.stringify(newState))
+    return newState
   }
 }
 
