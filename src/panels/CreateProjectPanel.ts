@@ -154,6 +154,7 @@ export class CreateProjectPanel {
     })
     interface CreateProjectData {
       package: string
+      command: string
       location: string
       flags: string[]
     }
@@ -171,7 +172,14 @@ export class CreateProjectPanel {
         name: 'Create Project',
         cwd: path.dirname(location),
         shellPath,
-        shellArgs: shellArgs(['--yes', data.package, path.basename(location), ...data.flags]),
+        shellArgs: shellArgs([
+          '--yes',
+          '--package',
+          data.package,
+          data.command,
+          path.basename(location),
+          ...data.flags,
+        ]),
       })
       terminal.show()
       await new Promise<void>((resolve) => {

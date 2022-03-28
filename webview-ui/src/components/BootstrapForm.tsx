@@ -126,6 +126,7 @@ export function BootstrapForm(props: BootstrapConfig) {
 
     const data = {
       package: props.package,
+      command: props.command,
       location: form.location,
       flags: props.configs
         .filter((item) => form[item.name])
