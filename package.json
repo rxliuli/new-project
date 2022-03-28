@@ -30,7 +30,17 @@
         "command": "new-project.newProject",
         "title": "New Project"
       }
-    ]
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "when": "explorerResourceIsFolder",
+          "command": "new-project.newProject",
+          "alt": "new-project.newProject",
+          "group": "2_workspace"
+        }
+      ]
+    }
   },
   "repository": {
     "type": "git",

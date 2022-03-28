@@ -19,6 +19,7 @@ export class CreateProjectPanel {
   public static currentPanel: CreateProjectPanel | undefined
   private readonly _panel: vscode.WebviewPanel
   private _disposables: vscode.Disposable[] = []
+  private cwd?: string
 
   /**
    * The HelloWorldPanel class private constructor (called only from the render method).
@@ -46,10 +47,11 @@ export class CreateProjectPanel {
    *
    * @param extensionUri The URI of the directory containing the extension.
    */
-  public static render(extensionUri: vscode.Uri) {
+  public static render(extensionUri: vscode.Uri, cwd?: string) {
     if (CreateProjectPanel.currentPanel) {
       // If the webview panel already exists reveal it
       CreateProjectPanel.currentPanel._panel.reveal(vscode.ViewColumn.One)
+      CreateProjectPanel.currentPanel.cwd = cwd
     } else {
       // If a webview panel does not already exist create and show a new one
       const panel = vscode.window.createWebviewPanel(
@@ -67,10 +69,7 @@ export class CreateProjectPanel {
       )
 
       CreateProjectPanel.currentPanel = new CreateProjectPanel(panel, extensionUri)
-      panel.webview.postMessage({
-        command: 'hello',
-        data: ['world'],
-      })
+      CreateProjectPanel.currentPanel.cwd = cwd
     }
   }
 
@@ -139,13 +138,13 @@ export class CreateProjectPanel {
     map.set('hello', (text: string) => {
       vscode.window.showInformationMessage(text)
     })
-    map.set('selectPath', async (text: string) => {
-      vscode.window.showInformationMessage(text)
+    map.set('selectPath', async () => {
       const res = await vscode.window.showOpenDialog({
         canSelectFiles: false,
         canSelectFolders: true,
         canSelectMany: false,
         title: 'Location',
+        defaultUri: this.cwd ? vscode.Uri.file(this.cwd) : undefined,
       })
       if (!res) {
         return null
@@ -189,14 +188,20 @@ export class CreateProjectPanel {
           }
         })
       })
-      console.log('执行完了')
-      await vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(location), true)
+      // console.log('执行完了')
+      const workspaceCwd = vscode.workspace.workspaceFolders?.[0].uri.fsPath
+      if (workspaceCwd && location.startsWith(path.resolve(workspaceCwd))) {
+        // console.log('不单独打开项目')
+        const packageJsonPath = path.resolve(location, 'package.json')
+        if (await pathExists(packageJsonPath)) {
+          await vscode.commands.executeCommand('vscode.open', vscode.Uri.file(packageJsonPath))
+        }
+      } else {
+        await vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(location), true)
+      }
       this._panel.dispose()
     })
-    map.set('getCurrentPath', async () => {
-      await new Promise((resolve) => setTimeout(resolve, 100))
-      return vscode.workspace.workspaceFolders?.[0].uri.fsPath
-    })
+    map.set('getCurrentPath', () => this.cwd)
 
     webview.onDidReceiveMessage(
       async (message: any) => {
