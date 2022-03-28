@@ -5,7 +5,7 @@ This is a vscode visual project creation plugin that attempts to provide a proje
 Here is a comparison of webstorm and vscode plugins
 
 ![webstorm](https://github.com/rxliuli/vscode-plugin-new-project/raw/master/docs/webstorm-cover.png)
-![vscode](https://github.com/rxliuli/vscode-plugin-new-project/raw/master/docs/webstorm-cover.png)
+![vscode](https://github.com/rxliuli/vscode-plugin-new-project/raw/master/docs/vscode-cover.png)
 
 ## Use
 
