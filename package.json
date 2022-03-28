@@ -2,7 +2,7 @@
   "name": "new-project",
   "displayName": "New Project",
   "description": "This is a vscode visual project creation plugin that attempts to provide a project creation panel in vscode similar to jetbrains ide",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "publisher": "rxliuli",
   "scripts": {
     "start:webview": "npm --prefix ./webview-ui run start",
