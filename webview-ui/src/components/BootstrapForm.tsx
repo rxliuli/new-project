@@ -1,4 +1,10 @@
-import { VSCodeButton, VSCodeCheckbox, VSCodeDropdown, VSCodeOption } from '@vscode/webview-ui-toolkit/react'
+import {
+  VSCodeButton,
+  VSCodeCheckbox,
+  VSCodeDropdown,
+  VSCodeOption,
+  VSCodeTextField,
+} from '@vscode/webview-ui-toolkit/react'
 import React, { useState } from 'react'
 import { useEffectOnce, useMount } from 'react-use'
 import { vscode } from '../utilities/vscode'
@@ -8,6 +14,7 @@ export interface SelectConfig {
   type: 'select'
   name: string
   label: string
+  default?: any
   options: {
     label: string
     value: string
@@ -18,13 +25,22 @@ export interface CheckboxConfig {
   type: 'checkbox'
   name: string
   label: string
+  default?: any
 }
 
-export type Conifg = SelectConfig | CheckboxConfig
+export interface InputConfig {
+  type: 'input'
+  name: string
+  label: string
+  default?: any
+}
+
+export type Conifg = SelectConfig | CheckboxConfig | InputConfig
 
 export interface BootstrapConfig {
   id: string
   title: string
+  package: string
   command: string
   configs: Conifg[]
 }
@@ -38,8 +54,12 @@ function TextField(props: { label: string; name: string; children: React.ReactNo
   )
 }
 
-async function invoke(command: string, ...args: any[]): Promise<any> {
+async function invoke(options: { command: string; default?: any; args?: any[] }): Promise<any> {
   return await new Promise<string>((resolve) => {
+    if (typeof acquireVsCodeApi !== 'function') {
+      resolve(options.default)
+      return
+    }
     const id = Date.now() + '_' + Math.random()
     const listener = (message: MessageEvent) => {
       const data = message.data
@@ -50,8 +70,8 @@ async function invoke(command: string, ...args: any[]): Promise<any> {
     }
     window.addEventListener('message', listener)
     vscode.postMessage({
-      command: command,
-      data: args,
+      command: options.command,
+      data: options.args,
       callback: id,
     })
   })
@@ -59,7 +79,7 @@ async function invoke(command: string, ...args: any[]): Promise<any> {
 
 function FilePathSelect(props: { value: string; onChange(value: string): void }) {
   async function onSelectPath() {
-    const res = await invoke('selectPath')
+    const res = await invoke({ command: 'selectPath' })
     if (res) {
       props.onChange(res)
     }
@@ -76,12 +96,20 @@ export function BootstrapForm(props: BootstrapConfig) {
   const [form, setForm] = useState<{ location: string; packageManager: string } & Record<string, any>>({} as any)
   useMount(async () => {
     const store = vscode.getState() as Record<string, any>
-    const currentPath = await invoke('getCurrentPath')
-    const init = { location: currentPath } as any
+    const currentPath = await invoke({ command: 'getCurrentPath' })
+    const init = {
+      ...props.configs.reduce((res, item) => {
+        if (item.default) {
+          res[item.name] = item.default
+        }
+        return res
+      }, {} as any),
+      location: currentPath,
+    } as any
     if (store && store[props.id]) {
       Object.assign(init, store[props.id])
-      console.log('init: ', init)
     }
+    console.log('init: ', init)
     setForm(init)
   })
   function onChange(name: string, value: any) {
@@ -97,8 +125,7 @@ export function BootstrapForm(props: BootstrapConfig) {
     e.preventDefault()
 
     const data = {
-      packageManager: form.packageManager,
-      command: props.command,
+      package: props.package,
       location: form.location,
       flags: props.configs
         .filter((item) => form[item.name])
@@ -113,22 +140,15 @@ export function BootstrapForm(props: BootstrapConfig) {
         }),
     }
     console.log('onCreate: ', form, data)
-    await invoke('createProject', data)
+    await invoke({
+      command: 'createProject',
+      args: [data],
+    })
   }
   return (
     <form className={css.BootstrapForm} onSubmit={onCreate}>
       <TextField label={'Location'} name={'location'}>
         <FilePathSelect value={form.location} onChange={(value) => onChange('location', value)} />
-      </TextField>
-      <TextField label={'Package manager'} name={'packageManager'}>
-        <VSCodeDropdown
-          value={form.packageManager}
-          onChange={(e) => onChange('packageManager', (e as React.ChangeEvent<HTMLSelectElement>).target.value)}
-        >
-          {['npm', 'yarn', 'pnpm'].map((item) => (
-            <VSCodeOption key={item}>{item}</VSCodeOption>
-          ))}
-        </VSCodeDropdown>
       </TextField>
       {props.configs.map((item) => (
         <TextField key={item.name} label={item.label} name={item.name}>
@@ -145,11 +165,16 @@ export function BootstrapForm(props: BootstrapConfig) {
           ) : item.type === 'checkbox' ? (
             <VSCodeCheckbox
               id={item.name}
-              value={form[item.name]}
+              checked={form[item.name]}
               onChange={(e) => onChange(item.name, (e as React.ChangeEvent<HTMLInputElement>).target.checked)}
             >
               {item.label}
             </VSCodeCheckbox>
+          ) : item.type === 'input' ? (
+            <VSCodeTextField
+              value={form[item.name] ?? ''}
+              onChange={(e) => onChange(item.name, (e as React.ChangeEvent<HTMLInputElement>).target.value)}
+            />
           ) : null}
         </TextField>
       ))}

@@ -2,7 +2,7 @@ import * as vscode from 'vscode'
 import { getUri } from '../utilities/getUri'
 import * as path from 'path'
 import { shellArgs } from '../utilities/shellArgs'
-import { pathExists, readdir, remove } from 'fs-extra'
+import { emptyDir, pathExists, readdir, remove } from 'fs-extra'
 import which = require('which')
 
 /**
@@ -153,8 +153,7 @@ export class CreateProjectPanel {
       return vscode.Uri.parse(res[0].path).fsPath
     })
     interface CreateProjectData {
-      packageManager: string
-      command: string
+      package: string
       location: string
       flags: string[]
     }
@@ -165,20 +164,14 @@ export class CreateProjectPanel {
         if (!answer) {
           return
         }
-        await remove(location)
+        await emptyDir(location)
       }
-      const shellPath = await which(data.packageManager)
+      const shellPath = await which('npx')
       const terminal = vscode.window.createTerminal({
         name: 'Create Project',
         cwd: path.dirname(location),
         shellPath,
-        shellArgs: shellArgs([
-          'create',
-          data.command,
-          path.basename(location),
-          { '--': data.packageManager !== 'yarn' },
-          ...data.flags,
-        ]),
+        shellArgs: shellArgs(['--yes', data.package, path.basename(location), ...data.flags]),
       })
       terminal.show()
       await new Promise<void>((resolve) => {
