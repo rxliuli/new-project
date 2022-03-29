@@ -16,6 +16,7 @@
     "postinstall": "pnpx simple-git-hooks"
   },
   "main": "./dist/extension.js",
+  "icon": "resources/logo.png",
   "engines": {
     "vscode": "^1.46.0"
   },
