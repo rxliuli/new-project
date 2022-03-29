@@ -54,32 +54,9 @@ function TextField(props: { label: string; name: string; children: React.ReactNo
   )
 }
 
-async function invoke(options: { command: string; default?: any; args?: any[] }): Promise<any> {
-  return await new Promise<string>((resolve) => {
-    if (typeof acquireVsCodeApi !== 'function') {
-      resolve(options.default)
-      return
-    }
-    const id = Date.now() + '_' + Math.random()
-    const listener = (message: MessageEvent) => {
-      const data = message.data
-      if (data.command === id) {
-        resolve(data.data[0])
-        window.removeEventListener('message', listener)
-      }
-    }
-    window.addEventListener('message', listener)
-    vscode.postMessage({
-      command: options.command,
-      data: options.args,
-      callback: id,
-    })
-  })
-}
-
 function FilePathSelect(props: { value: string; onChange(value: string): void }) {
   async function onSelectPath() {
-    const res = await invoke({ command: 'selectPath' })
+    const res = await vscode.invoke({ command: 'selectPath' })
     if (res) {
       props.onChange(res)
     }
@@ -95,8 +72,8 @@ function FilePathSelect(props: { value: string; onChange(value: string): void })
 export function BootstrapForm(props: BootstrapConfig) {
   const [form, setForm] = useState<{ location: string; packageManager: string } & Record<string, any>>({} as any)
   useMount(async () => {
-    const store = vscode.getState() as Record<string, any>
-    const currentPath = await invoke({ command: 'getCurrentPath' })
+    const store = (await vscode.getState(props.id)) as { location: string }
+    const currentPath = await vscode.invoke({ command: 'getCurrentPath' })
     const init = {
       ...props.configs.reduce((res, item) => {
         if (item.default) {
@@ -106,19 +83,17 @@ export function BootstrapForm(props: BootstrapConfig) {
       }, {} as any),
       location: currentPath,
     } as any
-    if (store && store[props.id]) {
-      Object.assign(init, store[props.id])
+    if (store) {
+      const { location, ...other } = store
+      Object.assign(init, other)
     }
     console.log('init: ', init)
     setForm(init)
   })
-  function onChange(name: string, value: any) {
+  async function onChange(name: string, value: any) {
     const val = { ...form, [name]: value }
     setForm(val)
-    vscode.setState({
-      ...(vscode.getState() as any),
-      [props.id]: val,
-    })
+    await vscode.setState(props.id, val)
   }
 
   async function onCreate(e: React.FormEvent<HTMLFormElement>) {
@@ -141,7 +116,7 @@ export function BootstrapForm(props: BootstrapConfig) {
         }),
     }
     console.log('onCreate: ', form, data)
-    await invoke({
+    await vscode.invoke({
       command: 'createProject',
       args: [data],
     })

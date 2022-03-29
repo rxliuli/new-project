@@ -36,6 +36,29 @@ class VSCodeAPIWrapper {
     }
   }
 
+  async invoke(options: { command: string; default?: any; args?: any[] }): Promise<any> {
+    return await new Promise<string>((resolve) => {
+      if (typeof acquireVsCodeApi !== 'function') {
+        resolve(options.default)
+        return
+      }
+      const id = Date.now() + '_' + Math.random()
+      const listener = (message: MessageEvent) => {
+        const data = message.data
+        if (data.command === id) {
+          resolve(data.data[0])
+          window.removeEventListener('message', listener)
+        }
+      }
+      window.addEventListener('message', listener)
+      vscode.postMessage({
+        command: options.command,
+        data: options.args,
+        callback: id,
+      })
+    })
+  }
+
   /**
    * Get the persistent state stored for this webview.
    *
@@ -44,15 +67,13 @@ class VSCodeAPIWrapper {
    *
    * @return The current state or `undefined` if no state has been set.
    */
-  public getState(): unknown | undefined {
-    // if (this.vsCodeApi) {
-    //   return this.vsCodeApi.getState()
-    // } else {
-    //   const state = localStorage.getItem('vscodeState')
-    //   return state ? JSON.parse(state) : undefined
-    // }
-    const state = localStorage.getItem('vscodeState')
-    return state ? JSON.parse(state) : undefined
+  async getState(key: string): Promise<unknown | undefined> {
+    if (this.vsCodeApi) {
+      return await this.invoke({ command: 'getState', args: [key] })
+    } else {
+      const state = localStorage.getItem(key)
+      return state ? JSON.parse(state) : undefined
+    }
   }
 
   /**
@@ -66,15 +87,12 @@ class VSCodeAPIWrapper {
    *
    * @return The new state.
    */
-  public setState<T extends unknown | undefined>(newState: T): T {
-    // if (this.vsCodeApi) {
-    //   return this.vsCodeApi.setState(newState)
-    // } else {
-    //   localStorage.setItem('vscodeState', JSON.stringify(newState))
-    //   return newState
-    // }
-    localStorage.setItem('vscodeState', JSON.stringify(newState))
-    return newState
+  async setState<T extends unknown | undefined>(key: string, newState: T): Promise<void> {
+    if (this.vsCodeApi) {
+      return await this.invoke({ command: 'setState', args: [key, newState] })
+    } else {
+      localStorage.setItem(key, JSON.stringify(newState))
+    }
   }
 }
 

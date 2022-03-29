@@ -20,6 +20,7 @@ export class CreateProjectPanel {
   private readonly _panel: vscode.WebviewPanel
   private _disposables: vscode.Disposable[] = []
   private cwd?: string
+  private globalState!: vscode.Memento
 
   /**
    * The HelloWorldPanel class private constructor (called only from the render method).
@@ -47,11 +48,12 @@ export class CreateProjectPanel {
    *
    * @param extensionUri The URI of the directory containing the extension.
    */
-  public static render(extensionUri: vscode.Uri, cwd?: string) {
+  public static render(extensionUri: vscode.Uri, globalState: vscode.Memento, cwd?: string) {
     if (CreateProjectPanel.currentPanel) {
       // If the webview panel already exists reveal it
       CreateProjectPanel.currentPanel._panel.reveal(vscode.ViewColumn.One)
       CreateProjectPanel.currentPanel.cwd = cwd
+      CreateProjectPanel.currentPanel.globalState = globalState
     } else {
       // If a webview panel does not already exist create and show a new one
       const panel = vscode.window.createWebviewPanel(
@@ -70,6 +72,7 @@ export class CreateProjectPanel {
 
       CreateProjectPanel.currentPanel = new CreateProjectPanel(panel, extensionUri)
       CreateProjectPanel.currentPanel.cwd = cwd
+      CreateProjectPanel.currentPanel.globalState = globalState
     }
   }
 
@@ -202,6 +205,8 @@ export class CreateProjectPanel {
       this._panel.dispose()
     })
     map.set('getCurrentPath', () => this.cwd)
+    map.set('getState', (key: string) => this.globalState.get(key))
+    map.set('setState', (key: string, value: any) => this.globalState.update(key, value))
 
     webview.onDidReceiveMessage(
       async (message: any) => {
