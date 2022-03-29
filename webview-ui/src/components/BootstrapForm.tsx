@@ -6,7 +6,7 @@ import {
   VSCodeTextField,
 } from '@vscode/webview-ui-toolkit/react'
 import React, { useState } from 'react'
-import { useEffectOnce, useMount } from 'react-use'
+import { useMount } from 'react-use'
 import { vscode } from '../utilities/vscode'
 import css from './BootstrapForm.module.css'
 
@@ -62,10 +62,12 @@ function FilePathSelect(props: { value: string; onChange(value: string): void })
     }
   }
   return (
-    <div className={css.FilePathSelect}>
-      <VSCodeButton onClick={onSelectPath}>Select Path</VSCodeButton>
-      <span title={props.value}>{props.value}</span>
-    </div>
+    <VSCodeTextField
+      value={props.value ?? ''}
+      onChange={(e) => props.onChange((e as React.ChangeEvent<HTMLInputElement>).target.value)}
+    >
+      <i slot="end" className={'codicon codicon-folder'} onClick={onSelectPath} />
+    </VSCodeTextField>
   )
 }
 

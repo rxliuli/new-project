@@ -2,7 +2,7 @@ import * as vscode from 'vscode'
 import { getUri } from '../utilities/getUri'
 import * as path from 'path'
 import { shellArgs } from '../utilities/shellArgs'
-import { emptyDir, pathExists, readdir, remove } from 'fs-extra'
+import { emptyDir, mkdirp, pathExists, readdir, remove } from 'fs-extra'
 import which = require('which')
 
 /**
@@ -110,6 +110,7 @@ export class CreateProjectPanel {
     const stylesUri = getUri(webview, extensionUri, ['webview-ui', 'build', 'assets', 'index.css'])
     // The JS file from the React build output
     const scriptUri = getUri(webview, extensionUri, ['webview-ui', 'build', 'assets', 'index.js'])
+    const ttfUri = getUri(webview, extensionUri, ['webview-ui', 'build', 'assets', 'codicon.ttf'])
 
     // Tip: Install the es6-string-html VS Code extension to enable code highlighting below
     return /*html*/ `
@@ -119,7 +120,14 @@ export class CreateProjectPanel {
           <meta charset="UTF-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <link rel="stylesheet" type="text/css" href="${stylesUri}">
-          <title>Hello World</title>
+          <style>
+            @font-face {
+              font-family: "codicon";
+              font-display: block;
+              src: url("${ttfUri}") format("truetype");
+            }
+          </style>
+          <title>New Project</title>
         </head>
         <body>
           <div id="root"></div>
@@ -162,12 +170,16 @@ export class CreateProjectPanel {
     }
     map.set('createProject', async (data: CreateProjectData) => {
       const location = path.resolve(data.location)
-      if ((await pathExists(location)) && (await readdir(location)).length > 0) {
-        const answer = await vscode.window.showInformationMessage('Project already exists', 'Yes', 'No')
-        if (!answer) {
-          return
+      if (await pathExists(location)) {
+        if ((await readdir(location)).length > 0) {
+          const answer = await vscode.window.showInformationMessage('Project already exists', 'Yes', 'No')
+          if (!answer) {
+            return
+          }
+          await emptyDir(location)
         }
-        await emptyDir(location)
+      } else {
+        await mkdirp(location)
       }
       const shellPath = await which('npx')
       const terminal = vscode.window.createTerminal({
