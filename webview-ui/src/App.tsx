@@ -1,5 +1,6 @@
 import { VSCodePanels, VSCodePanelTab, VSCodePanelView } from '@vscode/webview-ui-toolkit/react'
-import { useAsync, useAsyncFn } from 'react-use'
+import { useState } from 'react'
+import { useAsync, useAsyncFn, useMount } from 'react-use'
 import { BootstrapConfig, BootstrapForm } from './components/BootstrapForm'
 import { vscode } from './utilities/vscode'
 
@@ -205,21 +206,32 @@ const list: BootstrapConfig[] = [
 ]
 
 function App() {
+  const [active, setActive] = useState<string>(list[0].id)
+  useMount(async () => {
+    const active = (await vscode.getState('active')) as string
+    if (active) {
+      setActive(active ?? list[0].id)
+    }
+    console.log('active: ', active)
+  })
+  async function changeActive(newActive: string) {
+    setActive(newActive)
+    await vscode.setState('active', newActive)
+  }
+
   return (
-    <>
-      <VSCodePanels>
-        {list.map((item) => (
-          <VSCodePanelTab key={item.id} title={item.title}>
-            {item.title}
-          </VSCodePanelTab>
-        ))}
-        {list.map((item) => (
-          <VSCodePanelView key={item.id} title={item.title}>
-            <BootstrapForm {...item} />
-          </VSCodePanelView>
-        ))}
-      </VSCodePanels>
-    </>
+    <VSCodePanels activeid={active}>
+      {list.map((item) => (
+        <VSCodePanelTab key={item.id} id={item.id} title={item.title} onClick={() => changeActive(item.id)}>
+          {item.title}
+        </VSCodePanelTab>
+      ))}
+      {list.map((item) => (
+        <VSCodePanelView key={item.id} id={item.id} title={item.title}>
+          <BootstrapForm {...item} />
+        </VSCodePanelView>
+      ))}
+    </VSCodePanels>
   )
 }
 

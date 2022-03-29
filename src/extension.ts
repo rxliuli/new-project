@@ -2,7 +2,7 @@ import * as vscode from 'vscode'
 import { CreateProjectPanel } from './panels/CreateProjectPanel'
 
 export function activate(context: vscode.ExtensionContext) {
-  context.globalState.setKeysForSync(['vite', 'create-react-app', 'angular'])
+  context.globalState.setKeysForSync(['active', 'vite', 'create-react-app', 'angular'])
   // Create the show hello world command
   context.subscriptions.push(
     vscode.commands.registerCommand('new-project.newProject', async (url?: vscode.Uri) => {
