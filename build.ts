@@ -1,5 +1,5 @@
-const { build } = require('esbuild')
-const { copy, mkdirp, remove } = require('fs-extra')
+import { build } from 'esbuild'
+import { mkdirp, remove } from 'fs-extra'
 
 async function main() {
   await remove('./dist')
@@ -17,7 +17,7 @@ async function main() {
       {
         name: 'esbuild-plugin-log',
         setup(bundle) {
-          let start
+          let start: number
           bundle.onStart(() => {
             start = Date.now()
           })
