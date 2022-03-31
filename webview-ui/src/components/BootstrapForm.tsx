@@ -9,30 +9,26 @@ import React, { useState } from 'react'
 import { useMount } from 'react-use'
 import { vscode } from '../utilities/vscode'
 import css from './BootstrapForm.module.css'
-
-export interface SelectConfig {
-  type: 'select'
+export interface BaseConfig {
   name: string
   label: string
   default?: any
+}
+
+export interface SelectConfig extends BaseConfig {
+  type: 'select'
   options: {
     label: string
     value: string
   }[]
 }
 
-export interface CheckboxConfig {
+export interface CheckboxConfig extends BaseConfig {
   type: 'checkbox'
-  name: string
-  label: string
-  default?: any
 }
 
-export interface InputConfig {
+export interface InputConfig extends BaseConfig {
   type: 'input'
-  name: string
-  label: string
-  default?: any
 }
 
 export type Conifg = SelectConfig | CheckboxConfig | InputConfig
