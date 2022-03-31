@@ -1,11 +1,8 @@
 # new-project
 
-This is a vscode visual project creation plugin that attempts to provide a project creation panel in vscode similar to jetbrains ide. Currently only projects created with vite/create-react-app are supported, but more support is expected, along with support for customizing the type of projects created.
+This is a plugin for vscode to visually create a project, trying to provide a panel similar to jetbrains ide's creation project in vscode. Currently only project creation with vite/create-react-app/angular is supported, but custom generators are supported.
 
-Here is a comparison of webstorm and vscode plugins
-
-![webstorm](https://github.com/rxliuli/vscode-plugin-new-project/raw/master/docs/webstorm-cover.png)
-![vscode](https://github.com/rxliuli/vscode-plugin-new-project/raw/master/docs/vscode-cover.png)
+![vscode](https://github.com/rxliuli/vscode-plugin-new-project/raw/master/docs/vscode-demo.gif)
 
 ## Use
 
@@ -21,3 +18,112 @@ To create a submodule in monorepo
 3. Select the type of project to create
 
 ![create-module](https://github.com/rxliuli/vscode-plugin-new-project/raw/master/docs/create-module.png)
+
+## custom generator
+
+You can add other generators in the settings by yourself, for example, the following is the generator configuration of [@liuli-util/cli](https://www.npmjs.com/package/@liuli-util/cli)
+
+> [More generator configuration examples](https://github.com/rxliuli/vscode-plugin-new-project/blob/master/webview-ui/src/assets/generators.json)
+
+```json
+{
+  "newProject.generators": [
+    {
+      "id": "@liuli-util/cli",
+      "title": "liuli-cli",
+      "package": "@liuli-util/cli",
+      "command": "liuli-cli generate",
+      "configs": [
+        {
+          "type": "select",
+          "name": "template",
+          "label": "Template",
+          "default": "lib",
+          "options": [
+            { "label": "lib", "value": "lib" },
+            { "label": "cli", "value": "cli" }
+          ]
+        },
+        {
+          "type": "checkbox",
+          "name": "init-sync",
+          "label": "init sync",
+          "default": false
+        }
+      ]
+    }
+  ]
+}
+```
+
+complete schemas
+
+```json
+{
+  "type": "array",
+  "description": "List of generators to use",
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "The id of the generator"
+      },
+      "title": {
+        "type": "string",
+        "description": "The title of the generator"
+      },
+      "package": {
+        "type": "string",
+        "description": "npm package"
+      },
+      "command": {
+        "type": "string",
+        "description": "command to run"
+      },
+      "configs": {
+        "type": "array",
+        "description": "configs to pass to the command",
+        "items": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["select", "checkbox", "input"],
+              "description": ""
+            },
+            "name": {
+              "type": "string",
+              "description": ""
+            },
+            "label": {
+              "type": "string",
+              "description": ""
+            },
+            "default": {},
+            "options": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "description": "option label"
+                  },
+                  "value": {
+                    "type": "string",
+                    "description": "option value"
+                  }
+                },
+                "required": ["label", "value"]
+              }
+            }
+          },
+          "required": ["type", "name", "label"]
+        }
+      }
+    },
+    "required": ["id", "title", "package", "command", "configs"]
+  }
+}
+```

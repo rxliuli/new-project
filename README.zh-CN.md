@@ -1,11 +1,8 @@
 # new-project
 
-这是一个 vscode 可视化创建项目的插件，尝试在 vscode 中提供类似于 jetbrains ide 的创建项目的面板。目前仅支持使用 vite/create-react-app 创建项目，但预期将会支持更多，同时支持自定义创建项目的类型。
+这是一个 vscode 可视化创建项目的插件，尝试在 vscode 中提供类似于 jetbrains ide 的创建项目的面板。目前仅支持使用 vite/create-react-app/angular 创建项目，但支持自定义生成器。
 
-下面是 webstorm 与 vscode 插件的对比
-
-![webstorm](./docs/webstorm-cover.png)
-![vscode](./docs/vscode-cover.png)
+![vscode](https://github.com/rxliuli/vscode-plugin-new-project/raw/master/docs/vscode-demo.gif)
 
 ## 使用
 
@@ -21,3 +18,112 @@
 3. 选择创建的项目类型
 
 ![create-module](./docs/create-module.png)
+
+## 自定义生成器
+
+你可以自行在设置中添加其他的生成器，例如下面是 [@liuli-util/cli](https://www.npmjs.com/package/@liuli-util/cli) 的生成器配置
+
+> [更多的生成器配置示例](https://github.com/rxliuli/vscode-plugin-new-project/blob/master/webview-ui/src/assets/generators.json)
+
+```json
+{
+  "newProject.generators": [
+    {
+      "id": "@liuli-util/cli",
+      "title": "liuli-cli",
+      "package": "@liuli-util/cli",
+      "command": "liuli-cli generate",
+      "configs": [
+        {
+          "type": "select",
+          "name": "template",
+          "label": "Template",
+          "default": "lib",
+          "options": [
+            { "label": "lib", "value": "lib" },
+            { "label": "cli", "value": "cli" }
+          ]
+        },
+        {
+          "type": "checkbox",
+          "name": "init-sync",
+          "label": "init sync",
+          "default": false
+        }
+      ]
+    }
+  ]
+}
+```
+
+完整的 schema
+
+```json
+{
+  "type": "array",
+  "description": "List of generators to use",
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "The id of the generator"
+      },
+      "title": {
+        "type": "string",
+        "description": "The title of the generator"
+      },
+      "package": {
+        "type": "string",
+        "description": "npm package"
+      },
+      "command": {
+        "type": "string",
+        "description": "command to run"
+      },
+      "configs": {
+        "type": "array",
+        "description": "configs to pass to the command",
+        "items": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["select", "checkbox", "input"],
+              "description": ""
+            },
+            "name": {
+              "type": "string",
+              "description": ""
+            },
+            "label": {
+              "type": "string",
+              "description": ""
+            },
+            "default": {},
+            "options": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "description": "option label"
+                  },
+                  "value": {
+                    "type": "string",
+                    "description": "option value"
+                  }
+                },
+                "required": ["label", "value"]
+              }
+            }
+          },
+          "required": ["type", "name", "label"]
+        }
+      }
+    },
+    "required": ["id", "title", "package", "command", "configs"]
+  }
+}
+```
