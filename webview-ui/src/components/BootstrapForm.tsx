@@ -78,7 +78,7 @@ export function BootstrapForm(props: BootstrapConfig) {
     const currentPath = await vscode.invoke({ command: 'getCurrentPath' })
     const init = {
       ...props.configs.reduce((res, item) => {
-        if (item.default) {
+        if (item.default !== undefined) {
           res[item.name] = item.default
         }
         return res
@@ -106,16 +106,9 @@ export function BootstrapForm(props: BootstrapConfig) {
       command: props.command,
       location: form.location,
       flags: props.configs
-        .filter((item) => form[item.name])
-        .map((item) => {
-          let res: string
-          if (item.type === 'checkbox') {
-            res = item.name
-          } else {
-            res = item.name + '=' + form[item.name]
-          }
-          return `--${res}`
-        }),
+        .filter((item) => form[item.name] !== undefined)
+        .map((item) => '--' + item.name + '=' + form[item.name])
+        .filter((item) => item !== undefined),
     }
     console.log('onCreate: ', form, data)
     await vscode.invoke({
