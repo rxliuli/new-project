@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/rxliuli/vscode-plugin-new-project/master/webview-ui/src/assets/generators-schema.json",
+  "type": "array",
+  "description": "List of generators to use",
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "The id of the generator"
+      },
+      "title": {
+        "type": "string",
+        "description": "The title of the generator"
+      },
+      "package": {
+        "type": "string",
+        "description": "npm package"
+      },
+      "command": {
+        "type": "string",
+        "description": "command to run"
+      },
+      "configs": {
+        "type": "array",
+        "description": "configs to pass to the command",
+        "items": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "select",
+                "checkbox",
+                "input"
+              ],
+              "description": ""
+            },
+            "name": {
+              "type": "string",
+              "description": ""
+            },
+            "label": {
+              "type": "string",
+              "description": ""
+            },
+            "default": {},
+            "options": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "description": "option label"
+                  },
+                  "value": {
+                    "type": "string",
+                    "description": "option value"
+                  }
+                },
+                "required": [
+                  "label",
+                  "value"
+                ]
+              }
+            }
+          },
+          "required": [
+            "type",
+            "name",
+            "label"
+          ]
+        }
+      }
+    },
+    "required": [
+      "id",
+      "title",
+      "package",
+      "command",
+      "configs"
+    ]
+  }
+}

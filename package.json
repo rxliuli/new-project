@@ -5,6 +5,7 @@
   "version": "0.2.0",
   "publisher": "rxliuli",
   "scripts": {
+    "setup": "esno src/initJsonSchema.ts",
     "start:webview": "npm --prefix ./webview-ui run start",
     "build:webview": "npm --prefix ./webview-ui run build",
     "vscode:prepublish": "pnpm build",
@@ -144,7 +145,7 @@
     "@types/fs-extra": "^9.0.13",
     "@types/glob": "^7.1.3",
     "@types/jest": "^27.4.1",
-    "@types/node": "^12.11.7",
+    "@types/node": "^16.11.7",
     "@types/vscode": "^1.46.0",
     "@types/which": "^2.0.1",
     "@typescript-eslint/eslint-plugin": "^4.14.1",
