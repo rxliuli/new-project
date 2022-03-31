@@ -216,6 +216,7 @@ export class CreateProjectPanel {
       }
       this._panel.dispose()
     })
+    map.set('getGenerators', () => vscode.workspace.getConfiguration('newProject').get('generators'))
     map.set('getCurrentPath', () => this.cwd)
     map.set('getState', (key: string) => this.globalState.get(key))
     map.set('setState', (key: string, value: any) => this.globalState.update(key, value))
@@ -228,7 +229,7 @@ export class CreateProjectPanel {
         }
         const res = await map.get(command)!(...data)
         if (callback) {
-          console.log('callback: ', callback)
+          // console.log('callback: ', callback)
           this._panel.webview.postMessage({
             command: callback,
             data: [res],

@@ -6,6 +6,7 @@ export function activate(context: vscode.ExtensionContext) {
   // Create the show hello world command
   context.subscriptions.push(
     vscode.commands.registerCommand('new-project.newProject', async (url?: vscode.Uri) => {
+      // console.log('config: ', vscode.workspace.getConfiguration('newProject').get('generators'))
       // console.log('state: ', context.globalState.get('init'))
       // console.log('before: ', context.globalState.get('test'))
       // await context.globalState.update('test', { name: 'test' })

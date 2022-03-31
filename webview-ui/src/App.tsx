@@ -1,10 +1,10 @@
 import { VSCodePanels, VSCodePanelTab, VSCodePanelView } from '@vscode/webview-ui-toolkit/react'
 import { useState } from 'react'
-import { useAsync, useAsyncFn, useMount } from 'react-use'
+import { useMount } from 'react-use'
 import { BootstrapConfig, BootstrapForm } from './components/BootstrapForm'
 import { vscode } from './utilities/vscode'
 
-const list: BootstrapConfig[] = [
+const initList: BootstrapConfig[] = [
   {
     id: 'vite',
     title: 'Vite',
@@ -206,9 +206,16 @@ const list: BootstrapConfig[] = [
 ]
 
 function App() {
+  const [list, setList] = useState(initList)
   const [active, setActive] = useState<string>(list[0].id)
   useMount(async () => {
-    const active = (await vscode.getState('active')) as string
+    const [active, generators] = (await Promise.all([
+      vscode.getState('active'),
+      vscode.invoke({ command: 'getGenerators' }),
+    ])) as [string, BootstrapConfig[]]
+    console.log('generators', generators)
+    const generatorIdSet = new Set(generators.map((item) => item.id))
+    setList([...list.filter((item) => !generatorIdSet.has(item.id)), ...generators])
     if (active) {
       setActive(active ?? list[0].id)
     }
