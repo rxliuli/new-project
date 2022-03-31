@@ -196,5 +196,12 @@
         ]
       }
     ]
+  },
+  {
+    "id": "create-svelte",
+    "title": "Svelte",
+    "package": "create-svelte",
+    "command": "create-svelte",
+    "configs": []
   }
 ]
