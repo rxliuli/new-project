@@ -200,8 +200,21 @@
   {
     "id": "create-svelte",
     "title": "Svelte",
-    "package": "create-svelte",
-    "command": "create-svelte",
-    "configs": []
+    "package": "@svelte-add/create-kit",
+    "command": "create-kit",
+    "configs": [
+      {
+        "type": "input",
+        "name": "with",
+        "label": "with",
+        "default": "typescript"
+      },
+      {
+        "type": "checkbox",
+        "name": "install",
+        "label": "Install dependencies",
+        "default": false
+      }
+    ]
   }
 ]
