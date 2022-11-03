@@ -1,6 +1,6 @@
 # new-project
 
-This is a plugin for vscode to visually create a project, trying to provide a panel similar to jetbrains ide's creation project in vscode. Currently only project creation with vite/create-react-app/angular is supported, but custom generators are supported.
+This is a plugin for vscode to visually create a project, trying to provide a panel similar to jetbrains ide's creation project in vscode. Currently only project creation with `vite/create-react-app/angular/svelte` is supported, but custom generators are supported.
 
 ![vscode](https://github.com/rxliuli/vscode-plugin-new-project/raw/master/docs/vscode-demo.gif)
 
