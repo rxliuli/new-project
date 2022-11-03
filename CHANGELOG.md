@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.1
+
+- fix: fix bug when using npm not executing with npx
+
 ## 0.4.0
 
 - feat: support for custom package managers
