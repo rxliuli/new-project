@@ -1,5 +1,6 @@
 import * as which from 'which'
 import * as path from 'path'
+import { describe, it, expect } from 'vitest'
 
 describe('测试 which', () => {
   it('基本示例', async () => {
