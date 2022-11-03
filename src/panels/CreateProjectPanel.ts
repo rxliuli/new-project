@@ -182,7 +182,7 @@ export class CreateProjectPanel {
         await mkdirp(location)
       }
       const packageManager = vscode.workspace.getConfiguration('newProject').packageManager
-      const shellPath = await which(packageManager)
+      const shellPath = await which(packageManager === 'npm' ? 'npx' : 'pnpm')
       if (!shellPath) {
         await vscode.window.showErrorMessage(`You don't seem to have ${packageManager} installed`)
         return
