@@ -1,6 +1,6 @@
 # new-project
 
-这是一个 vscode 可视化创建项目的插件，尝试在 vscode 中提供类似于 jetbrains ide 的创建项目的面板。目前仅支持使用 vite/create-react-app/angular 创建项目，但支持自定义生成器。
+这是一个 vscode 可视化创建项目的插件，尝试在 vscode 中提供类似于 jetbrains ide 的创建项目的面板。目前仅支持使用 `vite/create-react-app/angular/svelte` 创建项目，但支持自定义生成器。
 
 ![vscode](https://github.com/rxliuli/vscode-plugin-new-project/raw/master/docs/vscode-demo.gif)
 
@@ -19,7 +19,13 @@
 
 ![create-module](./docs/create-module.png)
 
-## 自定义生成器
+## 配置
+
+### 选择包管理器
+
+目前支持 `npm/pnpm`，配置项为 `newProject.packageManager`，默认是 `npm`
+
+### 自定义生成器
 
 你可以自行在设置中添加其他的生成器，例如下面是 [@liuli-util/cli](https://www.npmjs.com/package/@liuli-util/cli) 的生成器配置
 
@@ -29,10 +35,10 @@
 {
   "newProject.generators": [
     {
-      "id": "@liuli-util/cli",
-      "title": "liuli-cli",
-      "package": "@liuli-util/cli",
-      "command": "liuli-cli generate",
+      "id": "create-liuli",
+      "title": "liuli",
+      "package": "create-liuli",
+      "command": "create-liuli",
       "configs": [
         {
           "type": "select",
@@ -46,9 +52,9 @@
         },
         {
           "type": "checkbox",
-          "name": "init-sync",
-          "label": "init sync",
-          "default": false
+          "name": "overwrite",
+          "label": "Overwrite",
+          "default": true
         }
       ]
     }
@@ -127,3 +133,4 @@
   }
 }
 ```
+

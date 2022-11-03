@@ -2,7 +2,7 @@
   "name": "new-project",
   "displayName": "New Project",
   "description": "This is a vscode visual project creation plugin that attempts to provide a project creation panel in vscode similar to jetbrains ide",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "publisher": "rxliuli",
   "scripts": {
     "setup": "esno src/initJsonSchema.ts",
@@ -11,7 +11,7 @@
     "vscode:prepublish": "pnpm build",
     "build": "tsup",
     "dev": "tsup --watch",
-    "release": "pnpm build && vsce package --yarn",
+    "release": "pnpm build && vsce package --no-dependencies",
     "pretest": "pnpm build && pnpm lint",
     "lint": "eslint src --ext ts",
     "postinstall": "pnpx simple-git-hooks"
@@ -33,7 +33,7 @@
   "main": "./dist/extension.js",
   "icon": "resources/logo.png",
   "engines": {
-    "vscode": "^1.46.0"
+    "vscode": "^1.71.0"
   },
   "categories": [
     "Other"
@@ -159,7 +159,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/rxliuli/vscode-plugin-new-project"
+    "url": "https://github.com/rxliuli/new-project"
   },
   "devDependencies": {
     "@commitlint/cli": "^12.1.4",
@@ -204,14 +204,7 @@
   },
   "lint-staged": {
     "src/**/*.{ts,tsx,js,jsx,css,vue}": [
-      "prettier --write",
-      "git add"
-    ]
-  },
-  "jest": {
-    "preset": "ts-jest",
-    "testMatch": [
-      "<rootDir>/src/**/__tests__/*.test.ts"
+      "prettier --write"
     ]
   }
 }

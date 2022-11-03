@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.0
+
+- feat: support for custom package managers
+
 ## 0.3.0
 
 - feat: support create svelte project by using @svelte-add/create-kit, ref: <https://github.com/svelte-add/svelte-add>
@@ -45,3 +49,4 @@
 - feat: implement basic functionality, verify feasibility
 - chore: remove dist
 - chore: initial commit
+

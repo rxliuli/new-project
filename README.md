@@ -19,7 +19,13 @@ To create a submodule in monorepo
 
 ![create-module](https://github.com/rxliuli/vscode-plugin-new-project/raw/master/docs/create-module.png)
 
-## custom generator
+## Configure
+
+### Select package manager
+
+Currently supports `npm/pnpm`, the configuration item is `newProject.packageManager`, the default is `npm`
+
+### Custom generator
 
 You can add other generators in the settings by yourself, for example, the following is the generator configuration of [@liuli-util/cli](https://www.npmjs.com/package/@liuli-util/cli)
 
@@ -29,10 +35,10 @@ You can add other generators in the settings by yourself, for example, the follo
 {
   "newProject.generators": [
     {
-      "id": "@liuli-util/cli",
-      "title": "liuli-cli",
-      "package": "@liuli-util/cli",
-      "command": "liuli-cli generate",
+      "id": "create-liuli",
+      "title": "liuli",
+      "package": "create-liuli",
+      "command": "create-liuli",
       "configs": [
         {
           "type": "select",
@@ -46,9 +52,9 @@ You can add other generators in the settings by yourself, for example, the follo
         },
         {
           "type": "checkbox",
-          "name": "init-sync",
-          "label": "init sync",
-          "default": false
+          "name": "overwrite",
+          "label": "Overwrite",
+          "default": true
         }
       ]
     }
@@ -127,3 +133,4 @@ complete schemas
   }
 }
 ```
+
