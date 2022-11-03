@@ -6,8 +6,8 @@
   "publisher": "rxliuli",
   "scripts": {
     "setup": "esno src/initJsonSchema.ts",
-    "start:webview": "npm --prefix ./webview-ui run start",
-    "build:webview": "npm --prefix ./webview-ui run build",
+    "start:webview": "pnpm --prefix ./webview-ui run start",
+    "build:webview": "pnpm --prefix ./webview-ui run build",
     "vscode:prepublish": "pnpm build",
     "build": "tsup",
     "dev": "tsup --watch",
@@ -192,8 +192,8 @@
   ],
   "prettier": "@liuli-util/prettier-standard-config",
   "simple-git-hooks": {
-    "commit-msg": "yarn commitlint --edit $1",
-    "pre-commit": "yarn lint-staged"
+    "commit-msg": "pnpm commitlint --edit $1",
+    "pre-commit": "pnpm lint-staged"
   },
   "commitlint": {
     "extends": [
