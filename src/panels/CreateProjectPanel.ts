@@ -181,19 +181,20 @@ export class CreateProjectPanel {
       } else {
         await mkdirp(location)
       }
-      const shellPath = await which('npx')
+      const packageManager = vscode.workspace.getConfiguration('newProject').packageManager
+      const shellPath = await which(packageManager)
+      if (!shellPath) {
+        await vscode.window.showErrorMessage(`You don't seem to have ${packageManager} installed`)
+        return
+      }
       const terminal = vscode.window.createTerminal({
         name: 'Create Project',
         cwd: path.dirname(location),
         shellPath,
-        shellArgs: shellArgs([
-          '--yes',
-          '--package',
-          data.package,
-          data.command,
-          path.basename(location),
-          ...data.flags,
-        ]),
+        shellArgs:
+          packageManager === 'npm'
+            ? ['--yes', '--package', data.package, data.command, path.basename(location), ...data.flags]
+            : ['--package', data.package, 'dlx', data.command, path.basename(location), ...data.flags],
       })
       terminal.show()
       await new Promise<void>((resolve) => {
